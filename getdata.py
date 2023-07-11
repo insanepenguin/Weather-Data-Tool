@@ -4,7 +4,7 @@ import json
 import datetime
 #import mysql.connector
 
-accessToken = "0473901677084da5a4d234400222509"
+accessToken = ""
 
 forcastUrl = "http://api.weatherapi.com/v1/forecast.json"
 
