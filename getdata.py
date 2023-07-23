@@ -55,6 +55,20 @@ def save_forcast_to_db(date, forcast_data, table_name):
     port='5432'
     )
     formated_date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+
+    print(type(formated_date))
+
+
+    #"daily_will_it_rain": 0,
+    #"daily_chance_of_rain": 0,
+    #"daily_will_it_snow": 0,
+    #"daily_chance_of_snow": 0,
+    if "totalsnow_cm" not in forcast_data:
+        forcast_data['totalsnow_cm'] = 0
+        forcast_data['daily_chance_of_snow'] = 0
+        forcast_data['daily_will_it_snow'] = 0
+        forcast_data['daily_chance_of_rain'] = 0
+        forcast_data['daily_will_it_rain'] = 0
     #print("INSERT into public.\"Forcast\"(\"Date\", maxtemp_c, maxtemp_f, mintemp_c, mintemp_f, totalprecip_mm, totalprecip_in, totalsnow_cm, avghumidity, daily_chance_of_rain, daily_chance_of_snow) VALUES (%s,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i)" % (formated_date,forcast_data['maxtemp_c'],forcast_data['maxtemp_f'],forcast_data['mintemp_c'],forcast_data['mintemp_f'],forcast_data['totalprecip_mm'],forcast_data['totalprecip_in'],forcast_data['totalsnow_cm'],forcast_data['avghumidity'],forcast_data['daily_chance_of_rain'],forcast_data['daily_chance_of_snow']))
 
     cursor = conn.cursor()
@@ -72,10 +86,15 @@ def get_forcast():
     date = forcast['forecast']['forecastday'][0]['date']
 
     forcast_data = forcast['forecast']['forecastday'][0]["day"]
+
+    forcast_data
+    save_forcast_to_db(date, forcast_data, "Forcast")
+
     
     save_forcast_to_db(date, forcast_data, "Forcast")
     historicDate = back_in_time(date)
     historic = call_api("%s?key=%s&q=14423&aqi=no&dt=%s" % (currentUrl,accessToken,historicDate))
+    saver_to_json(historic, "historic.json")
     historic_data = historic['forecast']['forecastday'][0]["day"]
     save_forcast_to_db(historicDate, historic_data, "Historic")
     return
