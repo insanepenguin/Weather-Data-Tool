@@ -14,10 +14,10 @@ currentUrl = "http://api.weatherapi.com/v1/history.json"
 #http://api.weatherapi.com/v1/history.json?key=0473901677084da5a4d234400222509&q=London&dt=2023-07-08
 
 conn = psycopg2.connect(
-    database="Weather_Data",
+    database="WeatherData",
     user='postgres',
-    password='password1',
-    host='192.168.1.60',
+    password='Password1',
+    host='192.168.1.58',
     port='5432'
 )
 
@@ -48,13 +48,14 @@ def back_in_time(date):
 
 def save_forcast_to_db(date, forcast_data, table_name):
     conn = psycopg2.connect(
-    database="Weather_Data",
+    database="WeatherData",
     user='postgres',
-    password='password1',
-    host='192.168.1.60',
+    password='Password1',
+    host='192.168.1.58',
     port='5432'
     )
     formated_date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+
     print(type(formated_date))
 
 
@@ -71,8 +72,8 @@ def save_forcast_to_db(date, forcast_data, table_name):
     #print("INSERT into public.\"Forcast\"(\"Date\", maxtemp_c, maxtemp_f, mintemp_c, mintemp_f, totalprecip_mm, totalprecip_in, totalsnow_cm, avghumidity, daily_chance_of_rain, daily_chance_of_snow) VALUES (%s,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i)" % (formated_date,forcast_data['maxtemp_c'],forcast_data['maxtemp_f'],forcast_data['mintemp_c'],forcast_data['mintemp_f'],forcast_data['totalprecip_mm'],forcast_data['totalprecip_in'],forcast_data['totalsnow_cm'],forcast_data['avghumidity'],forcast_data['daily_chance_of_rain'],forcast_data['daily_chance_of_snow']))
 
     cursor = conn.cursor()
-    cursor.execute("INSERT into public.\"Forcast\"(\"Date\", maxtemp_c, maxtemp_f, mintemp_c, mintemp_f, totalprecip_mm, totalprecip_in, totalsnow_cm, avghumidity, daily_chance_of_rain, daily_chance_of_snow) VALUES ('%s'::date,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i)"
-                    % (formated_date,forcast_data['maxtemp_c'],forcast_data['maxtemp_f'],forcast_data['mintemp_c'],forcast_data['mintemp_f'],forcast_data['totalprecip_mm'],forcast_data['totalprecip_in'],forcast_data['totalsnow_cm'],forcast_data['avghumidity'],forcast_data['daily_chance_of_rain'],forcast_data['daily_chance_of_snow']))
+    cursor.execute("INSERT into public.\"%s\"(\"Date\", maxtemp_c, maxtemp_f, mintemp_c, mintemp_f, totalprecip_mm, totalprecip_in, totalsnow_cm, avghumidity, daily_chance_of_rain, daily_chance_of_snow) VALUES ('%s'::date,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i)"
+                    % (table_name,formated_date,forcast_data['maxtemp_c'],forcast_data['maxtemp_f'],forcast_data['mintemp_c'],forcast_data['mintemp_f'],forcast_data['totalprecip_mm'],forcast_data['totalprecip_in'],forcast_data['totalsnow_cm'],forcast_data['avghumidity'],forcast_data['daily_chance_of_rain'],forcast_data['daily_chance_of_snow']))
     conn.commit()
     cursor.close()
     
@@ -85,9 +86,12 @@ def get_forcast():
     date = forcast['forecast']['forecastday'][0]['date']
 
     forcast_data = forcast['forecast']['forecastday'][0]["day"]
-    #forcast_data
-    # save_forcast_to_db(date, forcast_data, "Forcast")
+
+    forcast_data
+    save_forcast_to_db(date, forcast_data, "Forcast")
+
     
+    save_forcast_to_db(date, forcast_data, "Forcast")
     historicDate = back_in_time(date)
     historic = call_api("%s?key=%s&q=14423&aqi=no&dt=%s" % (currentUrl,accessToken,historicDate))
     saver_to_json(historic, "historic.json")
